@@ -11,8 +11,16 @@ app.get('/', (req,res)=> {
     res.send("hey buddy how's it going");
 })
 
-const dbconnection = require('./db/db-config')
+//Routes
+const teamRoutes = require('./routes/teamRoutes');
+app.use('/api/teams',teamRoutes);
 
+
+
+
+
+
+const dbconnection = require('./db/db-config')
 async function start() {
   try {
     // test DB connection
