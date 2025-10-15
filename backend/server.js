@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require("cors");
 
 
 const PORT = 3000;
@@ -6,6 +7,7 @@ const PORT = 3000;
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req,res)=> {
     res.send("hey buddy how's it going");
@@ -14,6 +16,10 @@ app.get('/', (req,res)=> {
 //Routes
 const teamRoutes = require('./routes/teamRoutes');
 app.use('/api/teams',teamRoutes);
+
+const matchRoutes = require('./routes/matchesRoute')
+app.use("/api/matches", matchRoutes);
+
 
 
 

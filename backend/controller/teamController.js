@@ -18,4 +18,20 @@ const addTeams = async (req,res)=> {
     }
 }
 
-module.exports = {addTeams};
+const teamsList= async (req, res) => {
+
+  try {
+    const [rows] = await dbconnection.execute(
+      "SELECT * FROM teams ORDER BY group_name, id"
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("DB Error:", err);
+    res
+      .status(500)
+      .json({ message: "Error fetching teams", error: err.message });
+  }
+};
+
+
+module.exports = {addTeams,teamsList};
