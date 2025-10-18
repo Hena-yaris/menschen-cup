@@ -82,4 +82,6 @@ const generateGroups = async (req, res) => {
 };
 
 
+//generate matches
+
 module.exports = { addTeams, teamsList, generateGroups };

@@ -2,8 +2,6 @@ const dbconnection = require('../db/db-config')
 
 
 // Match recorded and team stats 
-
-
 const addMatch = async (req, res) => {
   const { team_a_id, team_b_id, score_a, score_b, group_name, stage } =
     req.body;
@@ -86,7 +84,64 @@ const addMatch = async (req, res) => {
 };
 
 
+//generate group matches
+
+const autoGenerateGroupMatches = async (req, res) => {
+  try {
+    // 1️⃣ get all teams with their group names
+    const [teams] = await dbconnection.execute(
+      "SELECT id, group_name FROM teams WHERE group_name IS NOT NULL"
+    );
+
+    // 2️⃣ group them by group_name
+        
+
+    const grouped = teams.reduce((acc, team) => {
+      if (!acc[team.group_name]) acc[team.group_name] = [];
+      acc[team.group_name].push(team);
+      return acc;
+    }, {});
+
+    // // 3️⃣ generate all unique match combinations within each group
+    const matchPairs = [];
+    for (const group in grouped) {
+      const groupTeams = grouped[group];
+      for (let i = 0; i < groupTeams.length; i++) {
+        for (let j = i + 1; j < groupTeams.length; j++) {
+          matchPairs.push({
+            stage: "group",
+            group_name: group,
+            team_a_id: groupTeams[i].id,
+            team_b_id: groupTeams[j].id,
+          });
+        }
+      }
+    }
+
+    // 4️⃣ insert all matches into DB
+    for (const match of matchPairs) {
+      await dbconnection.execute(
+        "INSERT INTO matches (stage, group_name, team_a_id, team_b_id, played) VALUES (?, ?, ?, ?, ?)",
+        [match.stage, match.group_name, match.team_a_id, match.team_b_id, false]
+      );
+    }
+
+    res
+      .status(201)
+      .json({
+        message: "Group matches generated successfully",
+        total: matchPairs.length,
+      });
+  } catch (err) {
+    console.error("DB Error:", err);
+    res
+      .status(500)
+      .json({ message: "Error generating group matches", error: err.message });
+  }
+};
 
 
 
-module.exports = {addMatch};
+
+
+module.exports = { addMatch, autoGenerateGroupMatches };
