@@ -85,7 +85,6 @@ const addMatch = async (req, res) => {
 
 
 //generate group matches
-
 const autoGenerateGroupMatches = async (req, res) => {
   try {
     // 1️⃣ get all teams with their group names
@@ -140,8 +139,100 @@ const autoGenerateGroupMatches = async (req, res) => {
   }
 };
 
+//Group fixtures
+const groupMatchFixtures = async (req, res) => {
+
+  try {
+    const [matches] = await dbconnection.execute(`
+      SELECT m.id, m.stage, m.group_name, m.score_a, m.score_b, m.played,
+             ta.name AS team_a_name, tb.name AS team_b_name
+      FROM matches m
+      JOIN teams ta ON m.team_a_id = ta.id
+      JOIN teams tb ON m.team_b_id = tb.id
+      ORDER BY m.group_name, m.date;
+    `);
+    res.status(201).json(matches);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+//QUARTER FINALS SELECTION
+const quarterSelection = async (req,res)=> {
+  const [teams] = dbconnection.execute(
+    `SELECT id,name,group_name,points,goals_for,goals_against FROM teams WHERE group_name IS NOT NULL`
+  );
+
+  //grouped
+  const grouped = teams.reduce((acc, team) => {
+    if (!acc[team.group_name]) acc[team.group_name] = [];
+    acc[team.group_name].push(team);
+    return acc;
+  }, {});
+
+  //sorted each teams
+  for (const g in grouped) {
+    grouped[g].sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      const gdB = b.goals_for - b.goals_against;
+      const gdA = a.goals_for - a.goals_against;
+      if (gdB !== gdA) return gdB - gdA;
+      return b.goals_for - a.goals_for;
+    });
+  }
+
+  //pick qualifiers
+  let qualified = [];
+  //for 6 teams.
+  for (const g in grouped) {
+    qualified.push(grouped[g][0]);
+    qualified.push(grouped[g][1]);
+  }
+
+  //For the 2 best 3rd-place teams
+  let thirdplaces = Object.values(grouped).map((g)=> g[2]).filter(Boolean);
+
+  thirdplaces.sort((a,b)=> {
+    if(b.points !== a.points) return b.points - a.points;
+    const gdA =a.goals_for - a.goals_against;
+    const gdB = b.goals_for - b.goals_against;
+    if(gdB !== gdA) return b.gdB - a.gdA;
+    return b.goals_for - a.goals_for;
+  })
+
+  qualified.push(thirdPlaces[0], thirdPlaces[1]);
+
+
+  const A = grouped["A"];
+  const B = grouped["B"];
+  const C = grouped["C"];
+  const bestThirds = [thirdPlaces[0], thirdPlaces[1]];
+
+  //Define the pairings
+  const qfPairs = [
+    {a:A[0],b:B[1]},
+    {a:B[0],b: C[1]},
+    {a:C[0],b: bestThirds[0]},
+    {a:A[1], b:bestThirds[1]}
+  ];
+
+
+  //INSERT IN TO THE DATABASE
+  for(pair of qfPairs){
+    await dbconnection.execute(
+      `INSERT INTO matches (stage,team_a_id,team_b_id, played) VALUES (?,?,?,?)`,
+      ["quarter",pair.a.id,pair.b.id,false]
+    );
+  }
+
+}
 
 
 
 
-module.exports = { addMatch, autoGenerateGroupMatches };
+module.exports = {
+  addMatch,
+  autoGenerateGroupMatches,
+  groupMatchFixtures,
+  quarterSelection,
+};
