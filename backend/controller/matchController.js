@@ -268,84 +268,87 @@ const quarterSelection = async (req, res) => {
 };
 
 
-//semifinal matches selection
-const semiSelection = async (req,res)=> {
+//🥈 Semifinal Selection
+const semiSelection = async (req, res) => {
   try {
+    // 1. get quarterfinal matches that are finished
+    const [quarters] = await dbconnection.execute(`
+      SELECT id, team_a_id, team_b_id, score_a, score_b 
+      FROM matches 
+      WHERE stage = 'quarter' AND played = true
+    `);
 
-    //1,get all quarterFinal matches that are finished  
-    const [quarter] = await dbconnection.execute(`SELECT id,team_a_id, team_b_id, score_a, score_b FROM mathes WHERE group="quarter" AND played="true"`)
-
-    if(quarter<4){
-      res.status(400).json({message: "  Not all quarter final matches have't finished yet"})
+    if (quarters.length < 4) {
+      return res
+        .status(400)
+        .json({ message: "❌ Not all quarterfinals are finished yet" });
     }
 
-    //determine winners
-    const winners = quarter.map((m)=> {
-      if(m.score_a> m.score_b) return m.team_a_id;
-      if(m.score_b > m.score_a) return m.team_b_id;
-      return null;
-    }).filter(Boolean);
+    // 2. determine winners
+    const winners = quarters
+      .map((m) => {
+        if (m.score_a > m.score_b) return m.team_a_id;
+        if (m.score_b > m.score_a) return m.team_b_id;
+        return null; // handle draws separately if needed
+      })
+      .filter(Boolean);
 
-    //3 make semifinal pairs 1vs2 and 3 vs 4
-
+    // 3. make semifinal pairs (1 vs 2, 3 vs 4)
     const sfPairs = [
       { a: winners[0], b: winners[1] },
-      {a:winners[3], b: winners[4]}
+      { a: winners[2], b: winners[3] },
     ];
 
-    //4 insert into db
-    for(const pair of sfPairs) {
-      await dbconnection.execute(`INSERT INTO matches(stage,team_a_id, team_b_id, played) VALUES(?,?,?,?,)`, ['semi',pair.a,pair.b,false])
+    // 4. insert into DB
+    for (const pair of sfPairs) {
+      await dbconnection.execute(
+        `INSERT INTO matches (stage, team_a_id, team_b_id, played) VALUES (?, ?, ?, ?)`,
+        ["semi", pair.a, pair.b, false]
+      );
     }
-  
-  res.json({message: "semifinal matches  created", total: sfPairs.length})
-    
+
+    res.json({
+      message: "✅ Semifinal matches created",
+      total: sfPairs.length,
+    });
   } catch (err) {
-    console.error("Error in semiselection :",err)
-    res.status(500).json({message: err.message})
+    console.error("❌ Error in semiSelection:", err);
+    res.status(500).json({ message: err.message });
   }
-}
+};
 
 
-//final matches selection 
-const finalSelection = async (req, res)=>{
 
-  try{
-    //1,get semifinal matches that are finished
-    const [semi] = await dbconnection.execute(`SELECT id,team_a_id,team_b_id,score_a,score_b,played FROM matches WHERE stage ="semi AND played = "true"`)
+//🏆 Final Selection
+const finalSelection = async (req, res) => {
+  try {
+    const [semis] = await dbconnection.execute(`
+      SELECT id, team_a_id, team_b_id, score_a, score_b 
+      FROM matches 
+      WHERE stage = 'semi' AND played = true
+    `);
 
-    if(semi.length < 2) {
-      res.status(400).json({message: "not all semifinal matches are  finished yet"})
+    if (semis.length < 2) {
+      return res
+        .status(400)
+        .json({ message: "❌ Not all semifinals are finished yet" });
     }
 
-    //2,determine the winner
+    const winners = semis.map((m) =>
+      m.score_a > m.score_b ? m.team_a_id : m.team_b_id
+    );
 
-    const winners = semi.map((m)=>{
-      if(m.score_a> m.score_b) return m.team_a_id;
-      if(m.score_b > m.score_a) return m.team_b_id;
-      return null;
-    }).filter(Boolean)
+    await dbconnection.execute(
+      `INSERT INTO matches (stage, team_a_id, team_b_id, played) VALUES (?, ?, ?, ?)`,
+      ["final", winners[0], winners[1], false]
+    );
 
-    //3,setup finalmatch
-
-    const fPairs =  [
-      {a:winners[0], b: winners[1]}
-    ]
-
-    //4,insert to the database
-    for(const pair of fPairs) {
-      await dbconnection.execute(`INSERT INTO matches(stage,team_a_id,team_b_id,played) VALUES (?,?,?,?)`, ["final",pair.a,pair.b,false])
-    }
-
-    res.json({message: "final matches created", total: fPairs.length})
-
-
-
-  }catch (err){
-    console.error("Error in final selection",err)
-    res.status(500).json({message: message.err})
+    res.json({ message: "🏆 Final match created" });
+  } catch (err) {
+    console.error("❌ Error in finalSelection:", err);
+    res.status(500).json({ message: err.message });
   }
-}
+};
 
 
 
