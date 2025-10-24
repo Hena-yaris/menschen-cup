@@ -286,7 +286,7 @@ const semiSelection = async (req,res)=> {
       return null;
     }).filter(Boolean);
 
-    //3 makes semifinal pairs 1vs2 and 3 vs 4
+    //3 make semifinal pairs 1vs2 and 3 vs 4
 
     const sfPairs = [
       { a: winners[0], b: winners[1] },
@@ -295,7 +295,7 @@ const semiSelection = async (req,res)=> {
 
     //4 insert into db
     for(const pair of sfPairs) {
-      await dbconnection.execute(`INSERT INTO matches(stage,team_a_id, team_b_id, played) VALUES(?,?,?,?,)`, ['semi',pair.a,pair.b,"false"])
+      await dbconnection.execute(`INSERT INTO matches(stage,team_a_id, team_b_id, played) VALUES(?,?,?,?,)`, ['semi',pair.a,pair.b,false])
     }
   
   res.json({message: "semifinal matches  created", total: sfPairs.length})
@@ -303,6 +303,47 @@ const semiSelection = async (req,res)=> {
   } catch (err) {
     console.error("Error in semiselection :",err)
     res.status(500).json({message: err.message})
+  }
+}
+
+
+//final matches selection 
+const finalSelection = async (req, res)=>{
+
+  try{
+    //1,get semifinal matches that are finished
+    const [semi] = await dbconnection.execute(`SELECT id,team_a_id,team_b_id,score_a,score_b,played FROM matches WHERE stage ="semi AND played = "true"`)
+
+    if(semi.length < 2) {
+      res.status(400).json({message: "not all semifinal matches are  finished yet"})
+    }
+
+    //2,determine the winner
+
+    const winners = semi.map((m)=>{
+      if(m.score_a> m.score_b) return m.team_a_id;
+      if(m.score_b > m.score_a) return m.team_b_id;
+      return null;
+    }).filter(Boolean)
+
+    //3,setup finalmatch
+
+    const fPairs =  [
+      {a:winners[0], b: winners[1]}
+    ]
+
+    //4,insert to the database
+    for(const pair of fPairs) {
+      await dbconnection.execute(`INSERT INTO matches(stage,team_a_id,team_b_id,played) VALUES (?,?,?,?)`, ["final",pair.a,pair.b,false])
+    }
+
+    res.json({message: "final matches created", total: fPairs.length})
+
+
+
+  }catch (err){
+    console.error("Error in final selection",err)
+    res.status(500).json({message: message.err})
   }
 }
 
@@ -316,4 +357,5 @@ module.exports = {
   groupMatchFixtures,
   quarterSelection,
   semiSelection,
+  finalSelection,
 };
