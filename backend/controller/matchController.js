@@ -1,31 +1,70 @@
 const dbconnection = require('../db/db-config')
 
 
-//
 
-// Match recorded and team stats 
+// Match recorded and team stats
 const addMatch = async (req, res) => {
   const { team_a_id, team_b_id, score_a, score_b, group_name, stage } =
     req.body;
 
   try {
-    // 1. insert the match
-    const sql = `
-      INSERT INTO matches (team_a_id, team_b_id, score_a, score_b, group_name, stage, played)
-      VALUES (?, ?, ?, ?, ?, ?, true)
-    `;
-    await dbconnection.execute(sql, [
-      team_a_id,
-      team_b_id,
-      score_a,
-      score_b,
-      group_name,
-      stage,
-    ]);
+    let matchUpdated = false;
 
+    // 1. Check if an unplayed fixture already exists for ANY stage.
+    // If a fixture exists (either group or knockout), we UPDATE the score.
+    const [existingMatches] = await dbconnection.execute(
+      `SELECT id, team_a_id, team_b_id FROM matches WHERE stage = ? AND played = false
+        AND ( (team_a_id = ? AND team_b_id = ?) OR (team_a_id = ? AND team_b_id = ?) )`,
+      [stage, team_a_id, team_b_id, team_b_id, team_a_id]
+    );
 
-    if(stage==="group") {
-      // 2. update team stats
+    if (existingMatches.length > 0) {
+      // Match fixture found, so we UPDATE the score instead of INSERTING
+      const matchId = existingMatches[0].id;
+      
+      // Ensure scores are mapped correctly to match the fixture's team order
+      let final_score_a = score_a;
+      let final_score_b = score_b;
+
+      // If team_a in the request is actually team_b in the existing fixture, swap the scores
+      if (existingMatches[0].team_a_id != team_a_id) {
+        final_score_a = score_b;
+        final_score_b = score_a;
+      }
+
+      // **UPDATE** the existing fixture row with scores and set 'played' to true.
+      const updateSql = `
+        UPDATE matches SET score_a = ?, score_b = ?, played = true
+        WHERE id = ?
+      `;
+      await dbconnection.execute(updateSql, [final_score_a, final_score_b, matchId]);
+      
+      matchUpdated = true;
+    } else {
+      // If we are here, it means no fixture was found. This is expected if the match
+      // is being added manually (e.g., an ad-hoc friendly game).
+      console.warn(`No unplayed fixture found for stage: ${stage}. Proceeding to INSERT new match.`);
+    }
+    
+    // 2. If no existing match was found/updated, INSERT a new record.
+    // This handles manual entry or ad-hoc matches that were never set up as fixtures.
+    if (!matchUpdated) {
+      const insertSql = `
+        INSERT INTO matches (team_a_id, team_b_id, score_a, score_b, group_name, stage, played)
+        VALUES (?, ?, ?, ?, ?, ?, true)
+      `;
+      await dbconnection.execute(insertSql, [
+        team_a_id,
+        team_b_id,
+        score_a,
+        score_b,
+        group_name,
+        stage,
+      ]);
+    }
+
+    // 3. Update team stats (This block remains ONLY for group stage matches)
+    if (stage === "group") {
       let resultA = 0;
       let resultB = 0;
 
@@ -37,16 +76,18 @@ const addMatch = async (req, res) => {
         resultA = 1;
         resultB = 1; // draw
       }
-      // 3. update goals, points, and results for both teams
+      
+      // Update goals, points, and results for both teams
+      // Team A update
       await dbconnection.execute(
-        `UPDATE teams 
-       SET goals_for = goals_for + ?, 
-           goals_against = goals_against + ?, 
-           points = points + ?,
-           wins = wins + ?,
-           draws = draws + ?,
-           losses = losses + ?
-       WHERE id = ?`,
+        `UPDATE teams
+        SET goals_for = goals_for + ?,
+            goals_against = goals_against + ?,
+            points = points + ?,
+            wins = wins + ?,
+            draws = draws + ?,
+            losses = losses + ?
+        WHERE id = ?`,
         [
           score_a,
           score_b,
@@ -58,15 +99,16 @@ const addMatch = async (req, res) => {
         ]
       );
 
+      // Team B update
       await dbconnection.execute(
-        `UPDATE teams 
-       SET goals_for = goals_for + ?, 
-           goals_against = goals_against + ?, 
-           points = points + ?,
-           wins = wins + ?,
-           draws = draws + ?,
-           losses = losses + ?
-       WHERE id = ?`,
+        `UPDATE teams
+        SET goals_for = goals_for + ?,
+            goals_against = goals_against + ?,
+            points = points + ?,
+            wins = wins + ?,
+            draws = draws + ?,
+            losses = losses + ?
+        WHERE id = ?`,
         [
           score_b,
           score_a,
@@ -77,37 +119,22 @@ const addMatch = async (req, res) => {
           team_b_id,
         ]
       );
-
     }
-    else {
+    
 
-      const winner = score_a > score_b? team_a_id: score_b> score_a ? team_b_id: null;
-
-      if(!winner) {
-        res.status(400).json({message
-          : "Knockout matches cannot end in a draw"
-        })
-      }
-      
-
-    }
-
-     res.json({
-       message: `✅ Match recorded for ${
-         stage === "group" ? "group" : "knockout"
-       } stage`,
-     });
-
-
-
-
+    res.json({
+      message: `✅ Match score recorded/updated for ${
+        stage === "group" ? "group" : "knockout"
+      } stage`,
+    });
   } catch (err) {
     console.error(err);
     res
       .status(500)
-      .json({ message: "❌ Error adding match", error: err.message });
+      .json({ message: "❌ Error adding/updating match", error: err.message });
   }
 };
+
 
 
 //generate group matches
@@ -186,23 +213,35 @@ const groupMatchFixtures = async (req, res) => {
 
 
 
-//QUARTER FINALS SELECTION
+// QUARTER FINALS SELECTION (Safe Version)
 const quarterSelection = async (req, res) => {
   try {
+    // check if quarterfinals already exist
+    const [existing] = await dbconnection.execute(
+      `SELECT id FROM matches WHERE stage = 'quarter'`
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({
+        message: "⚠️ Quarterfinals already created. No new matches added.",
+      });
+    }
+
+    // fetch teams
     const [teams] = await dbconnection.execute(
       `SELECT id,name,group_name,points,goals_for,goals_against 
        FROM teams 
        WHERE group_name IS NOT NULL`
     );
 
-    // Group teams
+    // group them
     const grouped = teams.reduce((acc, team) => {
       if (!acc[team.group_name]) acc[team.group_name] = [];
       acc[team.group_name].push(team);
       return acc;
     }, {});
 
-    // Sort each group
+    // sort inside each group
     for (const g in grouped) {
       grouped[g].sort((a, b) => {
         if (b.points !== a.points) return b.points - a.points;
@@ -213,14 +252,14 @@ const quarterSelection = async (req, res) => {
       });
     }
 
-    // Top 2 teams from each group
+    // top two per group
     let qualified = [];
     for (const g in grouped) {
       qualified.push(grouped[g][0]);
       qualified.push(grouped[g][1]);
     }
 
-    // Two best 3rd-place teams
+    // best 3rd-place teams
     let thirdplaces = Object.values(grouped)
       .map((g) => g[2])
       .filter(Boolean);
@@ -235,13 +274,12 @@ const quarterSelection = async (req, res) => {
 
     qualified.push(thirdplaces[0], thirdplaces[1]);
 
-    // Assign groups
+    // define pairings
     const A = grouped["A"];
     const B = grouped["B"];
     const C = grouped["C"];
     const bestThirds = [thirdplaces[0], thirdplaces[1]];
 
-    // Define pairings
     const qfPairs = [
       { a: A[0], b: B[1] },
       { a: B[0], b: C[1] },
@@ -249,16 +287,17 @@ const quarterSelection = async (req, res) => {
       { a: A[1], b: bestThirds[1] },
     ];
 
-    // Insert matches
+    // insert into matches table
     for (const pair of qfPairs) {
       await dbconnection.execute(
-        `INSERT INTO matches (stage, team_a_id, team_b_id, played) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO matches (stage, team_a_id, team_b_id, played)
+         VALUES (?, ?, ?, ?)`,
         ["quarter", pair.a.id, pair.b.id, false]
       );
     }
 
     res.status(200).json({
-      message: "✅ Quarter final matches generated successfully",
+      message: "✅ Quarterfinal matches generated successfully",
       total: qfPairs.length,
     });
   } catch (err) {
@@ -266,6 +305,7 @@ const quarterSelection = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 //🥈 Semifinal Selection

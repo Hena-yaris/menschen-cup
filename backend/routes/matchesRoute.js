@@ -14,8 +14,5 @@ router.get("/groupMatch-fixture", groupMatchFixtures);
 router.post("/quarterSelection", quarterSelection);
 
 
-//get teams by its stage
-// router.get("/getTeams", getTeams);
-
 
 module.exports = router;
