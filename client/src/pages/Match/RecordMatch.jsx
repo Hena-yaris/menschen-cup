@@ -176,7 +176,7 @@ const RecordMatch = () => {
 
   return (
     <div className="min-h-screen p-4 flex flex-col items-center bg-gray-950 text-gray-100">
-      <h1 className="text-3xl sm:text-4xl text-center  font-extrabold text-[#0875f3] mb-8 mt-6">
+      <h1 className="text-4xl sm:text-5xl text-center  font-extrabold text-[#0875f3] mb-8 mt-3 md:mt-6  text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
         Tournament Match Recorder
       </h1>
 
@@ -260,10 +260,10 @@ const RecordMatch = () => {
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
             >
-               <option value="">Select Group</option>
-               <option value="A">Group A</option>
-               <option value="B">Group B</option>
-               <option value="C">Group C</option>
+              <option value="">Select Group</option>
+              <option value="A">Group A</option>
+              <option value="B">Group B</option>
+              <option value="C">Group C</option>
             </select>
           </div>
 
@@ -343,9 +343,7 @@ const RecordMatch = () => {
               groupForm.teamA === groupForm.teamB
             }
           >
-            {isLoading 
-              ? "Recording..."
-              : "Record Group Match"}
+            {isLoading ? "Recording..." : "Record Group Match"}
           </button>
         </form>
 
@@ -453,9 +451,7 @@ const RecordMatch = () => {
               knockoutForm.teamA === knockoutForm.teamB
             }
           >
-            {isLoading
-              ? "Recording..."
-              : "Record Knockout Match"}
+            {isLoading ? "Recording..." : "Record Knockout Match"}
           </button>
         </form>
       </div>

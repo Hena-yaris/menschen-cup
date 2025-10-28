@@ -508,26 +508,230 @@
 
 
 
-///////////////////////4
-import React from "react";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ///////////////////////4
+// import React from "react";
+
+// const KnockoutBracket = () => {
+//   const stages = {
+//     QF: [
+//       { id: 1, teamA: "Winner A", teamB: "Runner B" },
+//       { id: 2, teamA: "Winner B", teamB: "Runner C" },
+//       { id: 3, teamA: "Winner C", teamB: "Best 3rd A" },
+//       { id: 4, teamA: "Runner A", teamB: "Best 3rd B" },
+//     ],
+//     SF: [
+//       { id: 1, teamA: "QF1 Winner", teamB: "QF2 Winner" },
+//       { id: 2, teamA: "QF3 Winner", teamB: "QF4 Winner" },
+//     ],
+//     Final: [{ id: 1, teamA: "SF1 Winner", teamB: "SF2 Winner" }],
+//   };
+
+//   return (
+//     <div className="w-full overflow-x-auto p-6 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+//       {/* Desktop */}
+//       <div className="min-w-[900px] hidden md:flex flex-row justify-center gap-20 relative">
+//         <Stage title="Quarter Finals" matches={stages.QF} />
+//         <SVGConnector direction="right" />
+//         <Stage title="Semi Finals" matches={stages.SF} />
+//         <SVGConnector direction="right" />
+//         <Stage title="Final" matches={stages.Final} single />
+//       </div>
+
+//       {/* Mobile */}
+//       <div className="flex flex-col md:hidden items-center gap-10">
+//         <StageMobile title="Quarter Finals" matches={stages.QF} columns={2} />
+//         <CurvedDivider />
+//         <StageMobile title="Semi Finals" matches={stages.SF} columns={2} />
+//         <CurvedDivider />
+//         <StageMobile title="Final" matches={stages.Final} columns={1} final />
+//       </div>
+//     </div>
+//   );
+// };
+
+// const Stage = ({ title, matches, single }) => (
+//   <div className="flex flex-col justify-center gap-12 relative">
+//     <h2 className="text-xl font-bold mb-2 text-center">{title}</h2>
+//     {matches.map((m) => (
+//       <MatchCard key={m.id} {...m} wide={single} />
+//     ))}
+//   </div>
+// );
+
+// const StageMobile = ({ title, matches, columns, final }) => (
+//   <div className="w-full text-center">
+//     <h2 className="text-lg font-bold mb-3">{title}</h2>
+//     <div
+//       className={`grid ${
+//         columns === 2 ? "grid-cols-2" : "grid-cols-1"
+//       } gap-4 justify-items-center`}
+//     >
+//       {matches.map((m) => (
+//         <MatchCard key={m.id} {...m} mobile final={final} />
+//       ))}
+//     </div>
+//   </div>
+// );
+
+// const MatchCard = ({ teamA, teamB, mobile, wide, final }) => (
+//   <div
+//     className={`${
+//       mobile ? (final ? "w-[80%]" : "w-[85%]") : wide ? "w-52" : "w-40"
+//     } bg-slate-700 rounded-2xl shadow-lg shadow-slate-900/50 p-3 text-center relative hover:scale-[1.03] transition-transform duration-200`}
+//   >
+//     <div className="flex flex-col gap-2">
+//       <div className="bg-slate-600 py-1 rounded">{teamA}</div>
+//       <div className="text-sm text-slate-400">vs</div>
+//       <div className="bg-slate-600 py-1 rounded">{teamB}</div>
+//     </div>
+//   </div>
+// );
+
+// const SVGConnector = ({ direction }) => (
+//   <svg
+//     width="80"
+//     height="300"
+//     className={`absolute top-1/2 -translate-y-1/2 ${
+//       direction === "right" ? "right-[-40px]" : "left-[-40px]"
+//     }`}
+//   >
+//     <path
+//       d="M0,150 C40,150 40,0 80,0"
+//       stroke="#94a3b8"
+//       strokeWidth="2"
+//       fill="none"
+//       strokeDasharray="4 4"
+//     />
+//     <path
+//       d="M0,150 C40,150 40,300 80,300"
+//       stroke="#94a3b8"
+//       strokeWidth="2"
+//       fill="none"
+//       strokeDasharray="4 4"
+//     />
+//   </svg>
+// );
+
+// const CurvedDivider = () => (
+//   <div className="w-full flex justify-center">
+//     <svg width="200" height="40" viewBox="0 0 200 40">
+//       <path
+//         d="M0 20 Q100 0 200 20 Q100 40 0 20"
+//         stroke="#64748b"
+//         strokeWidth="2"
+//         fill="none"
+//         className="opacity-60"
+//       />
+//     </svg>
+//   </div>
+// );
+
+// export default KnockoutBracket;
+
+
+
+
+
+
+
+////////////////////5555
+import React, { useEffect, useState } from "react";
+import axiosBase from "../../api/axiosBase";
 
 const KnockoutBracket = () => {
-  const stages = {
-    QF: [
-      { id: 1, teamA: "Winner A", teamB: "Runner B" },
-      { id: 2, teamA: "Winner B", teamB: "Runner C" },
-      { id: 3, teamA: "Winner C", teamB: "Best 3rd A" },
-      { id: 4, teamA: "Runner A", teamB: "Best 3rd B" },
-    ],
-    SF: [
-      { id: 1, teamA: "QF1 Winner", teamB: "QF2 Winner" },
-      { id: 2, teamA: "QF3 Winner", teamB: "QF4 Winner" },
-    ],
-    Final: [{ id: 1, teamA: "SF1 Winner", teamB: "SF2 Winner" }],
+  const [stages, setStages] = useState({
+    QF: [],
+    SF: [],
+    Final: [],
+  });
+
+  useEffect(() => {
+    const fetchKnockouts = async () => {
+      try {
+        const quarters = await getStageData("quarter");
+        const semis = await getStageData("semi");
+        const finals = await getStageData("final");
+
+        setStages({
+          QF: quarters.length ? quarters : getPlaceholder("QF"),
+          SF: semis.length ? semis : getPlaceholder("SF"),
+          Final: finals.length ? finals : getPlaceholder("Final"),
+        });
+      } catch (err) {
+        console.error("Error fetching knockout data:", err);
+        // fallback to placeholder if error
+        setStages({
+          QF: getPlaceholder("QF"),
+          SF: getPlaceholder("SF"),
+          Final: getPlaceholder("Final"),
+        });
+      }
+    };
+
+    fetchKnockouts();
+  }, []);
+
+  const getStageData = async (stage) => {
+    const res = await axiosBase.get(`/matches/knockout/${stage}`);
+    return res.data.map((m) => ({
+      id: m.id,
+      teamA: m.team_a_name,
+      teamB: m.team_b_name,
+      scoreA: m.score_a,
+      scoreB: m.score_b,
+      played: m.played,
+    }));
   };
 
+  const getPlaceholder = (stage) => {
+    switch (stage) {
+      case "QF":
+        return [
+          { id: 1, teamA: "Winner A", teamB: "Runner B" },
+          { id: 2, teamA: "Winner B", teamB: "Runner C" },
+          { id: 3, teamA: "Winner C", teamB: "Best 3rd A" },
+          { id: 4, teamA: "Runner A", teamB: "Best 3rd B" },
+        ];
+      case "SF":
+        return [
+          { id: 1, teamA: "QF1 Winner", teamB: "QF2 Winner" },
+          { id: 2, teamA: "QF3 Winner", teamB: "QF4 Winner" },
+        ];
+      case "Final":
+        return [{ id: 1, teamA: "SF1 Winner", teamB: "SF2 Winner" }];
+      default:
+        return [];
+    }
+  };
+
+  
+
+
+
   return (
-    <div className="w-full overflow-x-auto p-6 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div className="w-full  overflow-x-auto p-6 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+      <h1 className="text-4xl sm:text-5xl text-center  font-extrabold text-[#0875f3] mb-8 mt-3 md:mt-6  text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
+        Tournament Knockout Stage
+      </h1>
+      {/* <h1 className="text-3xl sm:text-4xl text-center  font-extrabold text-[#0875f3] mb-8 mt-6">
+        Tournament Match Recorder
+      </h1> */}
       {/* Desktop */}
       <div className="min-w-[900px] hidden md:flex flex-row justify-center gap-20 relative">
         <Stage title="Quarter Finals" matches={stages.QF} />
@@ -573,16 +777,50 @@ const StageMobile = ({ title, matches, columns, final }) => (
   </div>
 );
 
-const MatchCard = ({ teamA, teamB, mobile, wide, final }) => (
+
+
+/////////
+  // A simple function to generate a random match time for upcoming fixtures
+  const getRandomTime = (matchId) => {
+    const times = ["19:00", "20:00", "21:00", "22:00"];
+    // Use match ID to get a consistent "random" time
+    return times[matchId % times.length];
+  };
+
+const MatchCard = ({
+  teamA,
+  teamB,
+  scoreA,
+  scoreB,
+  played,
+  id,
+  mobile,
+  wide,
+  final,
+}) => (
   <div
     className={`${
       mobile ? (final ? "w-[80%]" : "w-[85%]") : wide ? "w-52" : "w-40"
     } bg-slate-700 rounded-2xl shadow-lg shadow-slate-900/50 p-3 text-center relative hover:scale-[1.03] transition-transform duration-200`}
   >
-    <div className="flex flex-col gap-2">
-      <div className="bg-slate-600 py-1 rounded">{teamA}</div>
-      <div className="text-sm text-slate-400">vs</div>
-      <div className="bg-slate-600 py-1 rounded">{teamB}</div>
+    <div className="flex flex-col gap-2 items-center">
+      <div className="w-full bg-slate-600 py-1 rounded">{teamA}</div>
+      {/* Score or Time */}
+      <div className="w-24 text-center">
+        {played ? (
+          <span className="text-2xl font-bold bg-gray-700/50 px-3 py-1 rounded-md text-white">
+            {scoreA} - {scoreB}
+          </span>
+        ) : (
+          <div className="text-center">
+            <span className="text-xl font-bold text-blue-400">
+              {getRandomTime(id)}
+            </span>
+            <span className="text-xs text-gray-400 block">Upcoming</span>
+          </div>
+        )}
+      </div>
+      <div className="w-full bg-slate-600 py-1 rounded">{teamB}</div>
     </div>
   </div>
 );
@@ -627,4 +865,3 @@ const CurvedDivider = () => (
 );
 
 export default KnockoutBracket;
-

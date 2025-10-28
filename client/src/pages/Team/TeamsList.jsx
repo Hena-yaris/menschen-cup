@@ -26,7 +26,7 @@ const TeamsList = () => {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-200 py-10 px-6">
-      <h1 className="text-4xl font-bold text-center mb-10 tracking-wide">
+      <h1 className="text-4xl sm:text-5xl text-center  font-extrabold text-[#0875f3] mb-8 mt-3 md:mt-5 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
         Group Standings
       </h1>
 

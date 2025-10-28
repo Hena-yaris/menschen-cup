@@ -47,7 +47,7 @@ const Fixtures = () => {
     <div className="bg-gray-900 min-h-screen font-sans text-gray-200 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-10">
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white">
+          <h1 className="text-4xl sm:text-5xl text-center  font-extrabold text-[#0875f3] mb-8 mt-3 md:mt-5 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
             Group Stage Fixtures
           </h1>
           <p className="text-blue-400 mt-2 text-lg">
