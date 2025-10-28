@@ -5,7 +5,7 @@ import axiosBase from "../../api/axiosBase";
 
 const RecordMatch = () => {
   const [teams, setTeams] = useState([]);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const [groupForm, setGroupForm] = useState({
     teamA: "",
     teamB: "",
@@ -112,37 +112,38 @@ const RecordMatch = () => {
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "❌ Error recording knockout match");
-    }finally {
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const handleQuarterSelection = async (e)=> {
+  const handleQuarterSelection = async (e) => {
     setIsLoading(true);
     try {
       const res = await axiosBase.post("/matches/quarterSelection");
-      alert(res.data.message)
-      
+      alert(res.data.message);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Error generating quarterfinal matches")
-    }finally{
-      setIsLoading(false)
+      alert(
+        err.response?.data?.message || "Error generating quarterfinal matches"
+      );
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSemiSelection = async (e) => {
-     setIsLoading(true);
+    setIsLoading(true);
 
-     try {
+    try {
       const res = await axiosBase.post("/matches/semiSelection");
       alert(res.data.message);
-     } catch (err) {
+    } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message)
-     }finally{
+      alert(err.response?.data?.message);
+    } finally {
       setIsLoading(false);
-     }
+    }
   };
 
   const handleFinalSelection = async (e) => {
@@ -150,18 +151,15 @@ const RecordMatch = () => {
 
     try {
       const res = await axiosBase.post("/matches/finalSelection");
-      alert(res?.data?.message)
-      
+      alert(res?.data?.message);
     } catch (err) {
       console.error("Error to decide how's the winner");
       alert(err.response?.data?.message);
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
 
-
-  
   const filteredTeams = groupForm.group
     ? teams.filter((t) => t.group_name === groupForm.group)
     : [];
@@ -170,18 +168,26 @@ const RecordMatch = () => {
   const progressionBtnClasses =
     "w-full sm:w-auto py-3 px-6 text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.01] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
-  // Custom button styling for form submission
+  // Custom button styling for form submission - UPDATED TO USE BRAND GRADIENT
   const submitBtnClasses =
-    "w-full py-3 mt-3 bg-gradient-to-r from-[#0875f3] to-blue-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-700 transition duration-300 transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed";
+    "w-full py-3 mt-3 bg-gradient-to-r from-yellow-500 to-orange-600 text-gray-900 font-extrabold rounded-lg shadow-xl hover:from-yellow-600 hover:to-orange-700 transition duration-300 transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed";
+
+  // Custom input classes for a dark theme and rounded aesthetic
+  const inputBaseClasses =
+    "w-full p-3 bg-gray-800 border border-gray-700 rounded-xl placeholder-gray-500 focus:outline-none focus:ring-2 transition duration-200";
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center bg-gray-950 text-gray-100">
-      <h1 className="text-4xl sm:text-5xl text-center  font-extrabold text-[#0875f3] mb-8 mt-3 md:mt-6  text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
+    <div className="min-h-screen p-4 flex flex-col items-center bg-gray-950 text-gray-100 font-inter">
+      <h1
+        className="mr-auto text-4xl sm:text-5xl text-center font-extrabold mb-10 mt-6 py-3 px-6 
+               text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 
+               rounded-2xl shadow-2xl border-b-4 border-orange-500/70 "
+      >
         Tournament Match Recorder
       </h1>
 
       {/* Tournament Progression Buttons */}
-      <div className="w-full max-w-4xl mb-10 p-6 bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-4 justify-between">
+      <div className="w-full max-w-5xl mb-12 p-6 bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-4 justify-between">
         <button
           onClick={handleQuarterSelection}
           className={`${progressionBtnClasses} bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700`}
@@ -204,7 +210,7 @@ const RecordMatch = () => {
 
         <button
           onClick={handleSemiSelection}
-          className={`${progressionBtnClasses} bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700`}
+          className={`${progressionBtnClasses} bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700`}
           disabled={isLoading}
         >
           <svg
@@ -220,7 +226,7 @@ const RecordMatch = () => {
 
         <button
           onClick={handleFinalSelection}
-          className={`${progressionBtnClasses} bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 hover:from-yellow-500 hover:to-yellow-600`}
+          className={`${progressionBtnClasses} bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-extrabold hover:from-yellow-500 hover:to-orange-600`}
           disabled={isLoading}
         >
           <svg
@@ -240,24 +246,26 @@ const RecordMatch = () => {
       </div>
 
       {/* Forms Container */}
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl justify-center items-center ">
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl justify-center">
         {/* Group Match Form */}
         <form
           onSubmit={groupHandleSubmit}
-          className="w-full max-w-md bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl p-6 space-y-5 flex-1"
+          className="w-full max-w-xl bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl p-8 space-y-5 flex-1"
         >
-          <h2 className="text-2xl font-semibold text-center text-teal-400 tracking-wide">
+          <h2 className="text-2xl font-bold text-center text-yellow-400 tracking-wide">
             Record Group Stage Match
           </h2>
 
           {/* Group */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Group</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Group
+            </label>
             <select
               name="group"
               value={groupForm.group}
               onChange={handleGroupChange}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={`${inputBaseClasses} focus:ring-yellow-500`}
               required
             >
               <option value="">Select Group</option>
@@ -269,12 +277,14 @@ const RecordMatch = () => {
 
           {/* Team A */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Team A</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Team A
+            </label>
             <select
               name="teamA"
               value={groupForm.teamA}
               onChange={handleGroupChange}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={`${inputBaseClasses} focus:ring-yellow-500`}
               required
               disabled={!groupForm.group}
             >
@@ -289,26 +299,30 @@ const RecordMatch = () => {
 
           {/* Team B */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Team B</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Team B
+            </label>
             <select
               name="teamB"
               value={groupForm.teamB}
               onChange={handleGroupChange}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={`${inputBaseClasses} focus:ring-yellow-500`}
               required
               disabled={!groupForm.group || groupForm.teamA === ""}
             >
               <option value="">Select Team B</option>
-              {filteredTeams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
+              {filteredTeams
+                .filter((t) => t.id !== groupForm.teamA) // Filter out Team A from Team B selection
+                .map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
             </select>
           </div>
 
           {/* Scores */}
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-4 items-center pt-2">
             <span className="text-lg font-bold text-gray-300 w-1/4 text-right">
               Score:
             </span>
@@ -318,17 +332,17 @@ const RecordMatch = () => {
               value={groupForm.scoreA}
               onChange={handleGroupChange}
               placeholder="A"
-              className="w-1/4 p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-center"
+              className={`${inputBaseClasses} focus:ring-yellow-500 w-1/4 text-center`}
               required
             />
-            <span className="text-xl font-extrabold text-gray-400">-</span>
+            <span className="text-2xl font-extrabold text-orange-500">-</span>
             <input
               type="number"
               name="scoreB"
               value={groupForm.scoreB}
               onChange={handleGroupChange}
               placeholder="B"
-              className="w-1/4 p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-center"
+              className={`${inputBaseClasses} focus:ring-yellow-500 w-1/4 text-center`}
               required
             />
           </div>
@@ -350,20 +364,22 @@ const RecordMatch = () => {
         {/* Knockout Match Form */}
         <form
           onSubmit={KnockoutHandleSubmit}
-          className="w-full max-w-md bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl p-6 space-y-5 flex-1"
+          className="w-full max-w-xl bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl p-8 space-y-5 flex-1"
         >
-          <h2 className="text-2xl font-semibold text-center text-red-400 tracking-wide">
+          <h2 className="text-2xl font-bold text-center text-red-400 tracking-wide">
             Record Knockout Stage Match
           </h2>
 
           {/* Stage */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Stage</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Stage
+            </label>
             <select
               name="stage"
               value={knockoutForm.stage}
               onChange={handleKnockoutForm}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`${inputBaseClasses} focus:ring-red-500`}
               required
             >
               <option value="">Select Stage</option>
@@ -375,12 +391,14 @@ const RecordMatch = () => {
 
           {/* Team A */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Team A</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Team A
+            </label>
             <select
               name="teamA"
               value={knockoutForm.teamA}
               onChange={handleKnockoutForm}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`${inputBaseClasses} focus:ring-red-500`}
               required
               disabled={!knockoutForm.stage}
             >
@@ -395,18 +413,20 @@ const RecordMatch = () => {
 
           {/* Team B */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Team B</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Team B
+            </label>
             <select
               name="teamB"
               value={knockoutForm.teamB}
               onChange={handleKnockoutForm}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`${inputBaseClasses} focus:ring-red-500`}
               required
               disabled={knockoutForm.teamA === ""}
             >
               <option value="">Select Team B</option>
               {teams
-                .filter((t) => t.id != knockoutForm.teamA)
+                .filter((t) => t.id !== knockoutForm.teamA)
                 .map((team) => (
                   <option key={team.id} value={team.id}>
                     {team.name}
@@ -416,7 +436,7 @@ const RecordMatch = () => {
           </div>
 
           {/* Scores */}
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-4 items-center pt-2">
             <span className="text-lg font-bold text-gray-300 w-1/4 text-right">
               Score:
             </span>
@@ -426,17 +446,17 @@ const RecordMatch = () => {
               value={knockoutForm.scoreA}
               onChange={handleKnockoutForm}
               placeholder="A"
-              className="w-1/4 p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-center"
+              className={`${inputBaseClasses} focus:ring-red-500 w-1/4 text-center`}
               required
             />
-            <span className="text-xl font-extrabold text-gray-400">-</span>
+            <span className="text-2xl font-extrabold text-orange-500">-</span>
             <input
               type="number"
               name="scoreB"
               value={knockoutForm.scoreB}
               onChange={handleKnockoutForm}
               placeholder="B"
-              className="w-1/4 p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-center"
+              className={`${inputBaseClasses} focus:ring-red-500 w-1/4 text-center`}
               required
             />
           </div>
