@@ -395,6 +395,38 @@ const finalSelection = async (req, res) => {
 
 
 
+const knockoutFixture = async (req, res) => {
+  const { stage } = req.params;
+  if (!stage) {
+    return res.status(400).json({ message: "Missing stage parameter" });
+  }
+
+  try {
+    let query = `
+      SELECT m.id, m.stage, m.score_a, m.score_b,m.played,
+             ta.name AS team_a_name, tb.name AS team_b_name
+      FROM matches m
+      JOIN teams ta ON m.team_a_id = ta.id
+      JOIN teams tb ON m.team_b_id = tb.id
+      WHERE m.stage = ?
+    `;
+
+    const [matches] = await dbconnection.execute(query, [stage]);
+
+    if (!matches.length) {
+      return res.status(200).json([]); // frontend will use placeholders
+    }
+
+    res.status(200).json(matches);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching knockout matches" });
+  }
+};
+
+
+
+
 
 
 module.exports = {
@@ -404,4 +436,5 @@ module.exports = {
   quarterSelection,
   semiSelection,
   finalSelection,
+  knockoutFixture,
 };

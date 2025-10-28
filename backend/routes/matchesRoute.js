@@ -6,6 +6,7 @@ const {
   quarterSelection,
   semiSelection,
   finalSelection,
+  knockoutFixture,
 } = require("../controller/matchController");
 const router = express.Router();
 
@@ -16,6 +17,8 @@ router.get("/groupMatch-fixture", groupMatchFixtures);
 router.post("/quarterSelection", quarterSelection);
 router.post("/semiSelection", semiSelection);
 router.post("/finalSelection", finalSelection);
+
+router.get('/knockout/:stage',knockoutFixture)
 
 
 
