@@ -43,24 +43,16 @@ const addMatch = async (req, res) => {
     } else {
       // If we are here, it means no fixture was found. This is expected if the match
       // is being added manually (e.g., an ad-hoc friendly game).
-      console.warn(`No unplayed fixture found for stage: ${stage}. Proceeding to INSERT new match.`);
+      console.warn(`${stage}. Proceeding to INSERT new match.`);
     }
     
     // 2. If no existing match was found/updated, INSERT a new record.
     // This handles manual entry or ad-hoc matches that were never set up as fixtures.
+
     if (!matchUpdated) {
-      const insertSql = `
-        INSERT INTO matches (team_a_id, team_b_id, score_a, score_b, group_name, stage, played)
-        VALUES (?, ?, ?, ?, ?, ?, true)
-      `;
-      await dbconnection.execute(insertSql, [
-        team_a_id,
-        team_b_id,
-        score_a,
-        score_b,
-        group_name,
-        stage,
-      ]);
+      res
+        .status(400)
+        .json({ message: `Dude,No unplayed fixture found for stage: ${stage}` });
     }
 
     // 3. Update team stats (This block remains ONLY for group stage matches)
@@ -311,6 +303,17 @@ const quarterSelection = async (req, res) => {
 //🥈 Semifinal Selection
 const semiSelection = async (req, res) => {
   try {
+    // check if semifinals already exist
+    const [existing] = await dbconnection.execute(
+      `SELECT id FROM matches WHERE stage = 'semi'`
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({
+        message: "⚠️ semifinals already created. No new matches added.",
+      });
+    }
+
     // 1. get quarterfinal matches that are finished
     const [quarters] = await dbconnection.execute(`
       SELECT id, team_a_id, team_b_id, score_a, score_b 
