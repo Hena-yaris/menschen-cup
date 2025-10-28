@@ -52,11 +52,11 @@ const TeamsList = () => {
             </div>
 
             {groupTeams.sort((a,b)=> {
-                const diff = b.points-a.points;
-                if(diff !==0) return diff;
+                if (b.points !== a.points) return b.points - a.points;
                 const gdA = a.goals_for - a.goals_against;
                 const gdB = b.goals_for - b.goals_against;
-                return gdB - gdA;
+                if (gdB !== gdA) return gdB - gdA;
+                return b.goals_for - a.goals_for;
             }
         ).map((team, i) => {
               const goalDifference = team.goals_for - team.goals_against;
@@ -117,61 +117,3 @@ const TeamsList = () => {
 };
 
 export default TeamsList;
-
-// <div>
-//   {groupTeams
-//     .sort(
-//       (a, b) =>
-//         b.points - a.points ||
-//         b.goals_for - b.goals_against - (a.goals_for - a.goals_against)
-//     )
-//     .map((team, index) => {
-//       const goalDifference = team.goals_for - team.goals_against;
-//       return (
-//         <div
-//           key={team.id}
-//           className="grid grid-cols-12 gap-2 text-center items-center p-3 transition-colors duration-200 hover:bg-gray-700/50 border-b border-gray-800 last:border-0"
-//         >
-//           {/* Team Name and Logo */}
-//           <div className="col-span-5 flex items-center text-left">
-//             <span className="w-6 text-center text-gray-400 mr-2">
-//               {index + 1}
-//             </span>
-//             <img
-//               src={`https://placehold.co/40x40/334155/ffffff?text=${getInitials(
-//                 team.name
-//               )}`}
-//               alt={`${team.name} logo`}
-//               className="w-6 h-6 rounded-full mr-3"
-//             />
-//             <span className="font-semibold truncate">{team.name}</span>
-//           </div>
-
-//           {/* Stats */}
-//           <span>{team.wins}</span>
-//           <span>{team.draws}</span>
-//           <span>{team.losses}</span>
-//           <span>{team.goals_for}</span>
-//           <span>{team.goals_against}</span>
-
-//           {/* Goal Difference with conditional color */}
-//           <span
-//             className={`font-semibold ${
-//               goalDifference > 0
-//                 ? "text-green-400"
-//                 : goalDifference < 0
-//                 ? "text-red-400"
-//                 : "text-gray-400"
-//             }`}
-//           >
-//             {goalDifference > 0 ? `+${goalDifference}` : goalDifference}
-//           </span>
-
-//           {/* Points */}
-//           <span className="font-black text-lg text-blue-400">
-//             {team.points}
-//           </span>
-//         </div>
-//       );
-//     })}
-// </div>;
