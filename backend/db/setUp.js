@@ -1,4 +1,7 @@
 const dbconnection = require('./db-config');
+const bcrypt = require("bcrypt");
+
+
 
 
 const createTeams = `CREATE TABLE IF NOT EXISTS teams (
@@ -34,16 +37,25 @@ const createStages = `CREATE TABLE IF NOT EXISTS stages (
 )`;
 
 const createUsers = `CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(100) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        role ENUM('admin') DEFAULT 'admin'
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin','student') DEFAULT 'student'
 )`;
 
-
-(async ()=> {
+/**
+ * Function to set up the entire database structure and initial data.
+ */
+(async () => {
+    // 1. Define Admin Passwords (use strings for security best practice)
+    const admin1_pass = "adminPass1234!"; // Use a strong password!
+    const admin2_pass = "backupPass5678!";
 
     try {
+        // --- 2. Create Tables ---
+        // (Optional: await dbconnection.execute("DROP TABLE IF EXISTS users");)
+
         await dbconnection.execute(createTeams);
         console.log("✅ Teams Table ready");
 
@@ -55,8 +67,42 @@ const createUsers = `CREATE TABLE IF NOT EXISTS users (
 
         await dbconnection.execute(createUsers);
         console.log("✅ Users Table ready");
+        
+        // --- 3. Hash Passwords and Insert Admin Users ---
+        // The hashing MUST happen inside the async block
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassA1 = await bcrypt.hash(admin1_pass, salt);
+        const hashedPassA2 = await bcrypt.hash(admin2_pass, salt);
+        console.log("✅ Admin passwords hashed.");
+        
+        // Use INSERT IGNORE to prevent errors if the script is run multiple times
+        const insertAdminsQuery = `
+            INSERT IGNORE INTO users (username, email, password, role) 
+            VALUES 
+            (?, ?, ?, ?),
+            (?, ?, ?, ?)
+        `;
+        
+        const params = [
+            "main_admin", "main@gmail.mfm", hashedPassA1, "admin",
+            "backup_admin", "backup@gmail.mfm", hashedPassA2, "admin"
+        ];
+        
+        const [result] = await dbconnection.execute(insertAdminsQuery, params);
+        console.log(`✅ Admin seeding complete. ${result.affectedRows} new admin(s) inserted.`);
 
+
+        // 4. IMPORTANT: Close the connection/pool when done
+        if (dbconnection.end) {
+            await dbconnection.end();
+            console.log("✅ Database connection closed.");
+        }
+        
     } catch (err) {
-        console.error("❌ Error creating table:", err.message);
+        console.error("❌ Error setting up database:", err.message);
+        // Ensure connection is closed even on error
+        if (dbconnection.end) {
+             await dbconnection.end();
+        }
     }
 })();

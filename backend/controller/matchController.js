@@ -195,8 +195,11 @@ const groupMatchFixtures = async (req, res) => {
       JOIN teams ta ON m.team_a_id = ta.id
       JOIN teams tb ON m.team_b_id = tb.id
       
+      
       ORDER BY m.group_name, m.date;
     `);
+    //WHERE stage="group" finally
+    
     res.status(201).json(matches);
   } catch (err) {
     res.status(500).json({ error: err.message });
