@@ -88,9 +88,13 @@ const login = async (req,res)=> {
         return res.status(500).json({message:"something went wrong"})
 
     }
-    
-
-   
 }
 
-module.exports= {register,login};
+const checkUser = async (req,res) => {
+    const {username,userId,role} = req.user;
+    return res
+      .status(200)
+      .json({ message: "check user", username, userId, role });
+}
+
+module.exports= {register,login,checkUser};
