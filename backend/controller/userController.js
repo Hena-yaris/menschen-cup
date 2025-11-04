@@ -1,6 +1,7 @@
 const dbconnection = require("../db/db-config");
 
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 //register
 const register = async (req,res)=> {
@@ -60,7 +61,7 @@ const login = async (req,res)=> {
     }
 
     try {
-        const [user] = await dbconnection.execute("SELECT username,id,password FROM users WHERE email=?",[email]);
+        const [user] = await dbconnection.execute("SELECT username,id,role,password FROM users WHERE email=?",[email]);
 
         if(user.length===0) {
             return res.status(400).json({message:"invalid credential!"})
@@ -71,7 +72,14 @@ const login = async (req,res)=> {
                 message: "invalid credential",
               });
             } 
-              return res.json({ user:user[0].password });
+            
+            const username = user[0].username;
+            const userId = user[0].id;
+            const role = user[0].role;
+
+            const token = jwt.sign({username,userId,role},"henayaris",{expiresIn: "21d"});
+
+            return res.status(201).json({message: "Login successfully",token});
             
     
     }catch (err) {
