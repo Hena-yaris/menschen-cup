@@ -1,33 +1,40 @@
-import React from 'react'
-import {Routes, Route}  from "react-router-dom";
-import AddTeam from './pages/Team/AddTeam';
-import Home from './pages/Home/Home';
-import TeamsList from './pages/Team/TeamsList';
-import RecordMatch from './pages/Match/RecordMatch';
-import Fixtures from './pages/Match/Fixtures';
-import KnockoutBracket from './pages/Match/KnockoutBracket';
-import Navbar from './components/Navbar';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
+import AddTeam from "./pages/Team/AddTeam";
+import Home from "./pages/Home/Home";
+import TeamsList from "./pages/Team/TeamsList";
+import RecordMatch from "./pages/Match/RecordMatch";
+import Fixtures from "./pages/Match/Fixtures";
+import KnockoutBracket from "./pages/Match/KnockoutBracket";
+import Register from "./pages/Users/Register";
+import Login from "./pages/Users/Login";
+
+import PublicLayout from "./Layouts/PublicLayout";
+import PrivateLayout from "./Layouts/PrivateLayout";
 
 function App() {
-
   return (
     <>
-    <Navbar/>
       <Routes>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/addteam' element={<AddTeam/>}/>
-        <Route path='/teamslist' element={<TeamsList/>}/>
+        {/* PUBLIC ROUTES */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
 
-
-        <Route path='/addmatch' element={<RecordMatch/>}/>
-        <Route path='/fixtures' element={<Fixtures/>}/>
-        <Route path='/knockout' element={<KnockoutBracket/>}/>
-
-
+        {/* PRIVATE ROUTES */}
+        <Route element={<PrivateLayout />}>
+          <Route path="/addteam" element={<AddTeam />} />
+          <Route path="/teamslist" element={<TeamsList />} />
+          <Route path="/addmatch" element={<RecordMatch />} />
+          <Route path="/fixtures" element={<Fixtures />} />
+          <Route path="/knockout" element={<KnockoutBracket />} />
+        </Route>
       </Routes>
     </>
-  )
+  );
 }
 
 export default App;
