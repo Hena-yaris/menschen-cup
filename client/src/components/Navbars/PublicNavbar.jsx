@@ -6,7 +6,7 @@ function PublicNavbar() {
   return (
     <nav
       className="
-        backdrop-blur-md bg-gray-900/40 
+        backdrop-blur-md bg-gray-950
         border-b border-orange-500/30 
         py-4 px-4 md:px-8 
         flex justify-between items-center 
