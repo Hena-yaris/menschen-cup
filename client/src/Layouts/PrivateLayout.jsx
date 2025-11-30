@@ -1,9 +1,14 @@
 import React from 'react'
+import PrivateNavbar from '../components/Navbars/PrivateNavbar'
+import { Outlet } from 'react-router-dom'
 
 function PrivateLayout() {
   return (
-    <div>PrivateLayout</div>
-  )
+    <>
+      <PrivateNavbar />
+      <Outlet />
+    </>
+  );
 }
 
 export default PrivateLayout

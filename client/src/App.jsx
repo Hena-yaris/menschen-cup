@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 import AddTeam from "./pages/Team/AddTeam";
 import TeamsList from "./pages/Team/TeamsList";
@@ -13,7 +13,10 @@ import PublicLayout from "./Layouts/PublicLayout";
 import PrivateLayout from "./Layouts/PrivateLayout";
 import PublicHome from "./pages/Home/publicHome";
 
+import PrivateNavbar from "./components/Navbars/PrivateNavbar";
+
 function App() {
+  
   return (
     <>
       <Routes>
@@ -32,6 +35,8 @@ function App() {
           <Route path="/fixtures" element={<Fixtures />} />
           <Route path="/knockout" element={<KnockoutBracket />} />
         </Route>
+
+        <Route path="/pnb" element={<PrivateNavbar/>}/>
       </Routes>
     </>
   );

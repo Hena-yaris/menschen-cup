@@ -25,8 +25,12 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-           const res = await axiosBase.post("/users/login",{email,password}) 
+           const res= await axiosBase.post("/users/login",{email,password}) 
            alert(res.data.message);
+           const {data} = res;
+           console.log(data);
+
+           localStorage.setItem("token",data.token)
 
            setEmail("");
            setPassword("");
