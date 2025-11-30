@@ -1,5 +1,4 @@
 const dbconnection = require('./db-config');
-const bcrypt = require("bcrypt");
 
 
 
@@ -48,9 +47,7 @@ const createUsers = `CREATE TABLE IF NOT EXISTS users (
  * Function to set up the entire database structure and initial data.
  */
 (async () => {
-    // 1. Define Admin Passwords (use strings for security best practice)
-    const admin1_pass = "adminPass1234!"; // Use a strong password!
-    const admin2_pass = "backupPass5678!";
+    
 
     try {
         // --- 2. Create Tables ---
@@ -68,28 +65,6 @@ const createUsers = `CREATE TABLE IF NOT EXISTS users (
         await dbconnection.execute(createUsers);
         console.log("✅ Users Table ready");
         
-        // --- 3. Hash Passwords and Insert Admin Users ---
-        // The hashing MUST happen inside the async block
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassA1 = await bcrypt.hash(admin1_pass, salt);
-        const hashedPassA2 = await bcrypt.hash(admin2_pass, salt);
-        console.log("✅ Admin passwords hashed.");
-        
-        // Use INSERT IGNORE to prevent errors if the script is run multiple times
-        const insertAdminsQuery = `
-            INSERT IGNORE INTO users (username, email, password, role) 
-            VALUES 
-            (?, ?, ?, ?),
-            (?, ?, ?, ?)
-        `;
-        
-        const params = [
-            "main_admin", "main@gmail.mfm", hashedPassA1, "admin",
-            "backup_admin", "backup@gmail.mfm", hashedPassA2, "admin"
-        ];
-        
-        const [result] = await dbconnection.execute(insertAdminsQuery, params);
-        console.log(`✅ Admin seeding complete. ${result.affectedRows} new admin(s) inserted.`);
 
 
         // 4. IMPORTANT: Close the connection/pool when done
