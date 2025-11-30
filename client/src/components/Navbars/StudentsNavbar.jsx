@@ -90,15 +90,20 @@ function StudentsNavbar() {
           />
 
           <button
-            className="
-              flex items-center gap-2 
-              text-orange-400 hover:text-orange-300 
-              text-sm md:text-base transition-all
-            "
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+                 onClick={(e)=> {
+                      localStorage.removeItem("token")
+                      localStorage.removeItem("user")
+                      navigate('/login')
+                    }}
+                      className="
+                        flex items-center gap-2 
+                        text-orange-400 hover:text-orange-300 
+                        text-sm md:text-base transition-all cursor-pointer
+                      "
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Logout
+             </button>
         </div>
       </div>
     </nav>

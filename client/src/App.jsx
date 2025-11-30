@@ -13,9 +13,9 @@ import PublicLayout from "./Layouts/PublicLayout";
 import PrivateLayout from "./Layouts/PrivateLayout";
 import PublicHome from "./pages/Home/publicHome";
 
-import PrivateNavbar from "./components/Navbars/PrivateNavbar";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import AdminRegister from "./pages/Users/AdminRegistration";
 
 function App() {
   
@@ -27,6 +27,7 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<PublicHome />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/adminregister" element={<AdminRegister />} />
             <Route path="/login" element={<Login />} />
           </Route>
 
@@ -39,13 +40,12 @@ function App() {
             }
           >
             <Route path="/addteam" element={<AddTeam />} />
+
             <Route path="/teamslist" element={<TeamsList />} />
             <Route path="/addmatch" element={<RecordMatch />} />
             <Route path="/fixtures" element={<Fixtures />} />
             <Route path="/knockout" element={<KnockoutBracket />} />
           </Route>
-
-          <Route path="/pnb" element={<PrivateNavbar />} />
         </Routes>
       </AuthProvider>
     </>

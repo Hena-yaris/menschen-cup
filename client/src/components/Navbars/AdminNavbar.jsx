@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Trophy, LogOut } from "lucide-react";
 
-function Admin() {
+function AdminNavbar() {
   const navigate = useNavigate();
   
   
@@ -109,10 +109,15 @@ function Admin() {
           />
 
           <button
+          onClick={(e)=> {
+            localStorage.removeItem("token")
+            localStorage.removeItem("user")
+            navigate('/login')
+          }}
             className="
               flex items-center gap-2 
               text-orange-400 hover:text-orange-300 
-              text-sm md:text-base transition-all
+              text-sm md:text-base transition-all cursor-pointer
             "
           >
             <LogOut className="w-5 h-5" />
@@ -124,4 +129,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default AdminNavbar;
