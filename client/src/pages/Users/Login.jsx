@@ -3,6 +3,9 @@ import axiosBase from "../../api/axiosBase";
 import { useNavigate } from "react-router-dom";
 
 import { Eye ,EyeOff } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+
 
 const Login = () => {
     const [email,setEmail] = useState("");
@@ -11,6 +14,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
+    const {setUser} = useContext(AuthContext);
 
     const handleSubmit = async (e)=> {
         e.preventDefault();
@@ -30,11 +34,12 @@ const Login = () => {
            const {data} = res;
            console.log(data);
 
-           localStorage.setItem("token",data.token)
+           localStorage.setItem("token",data.token);
+           setUser(data.user);
 
            setEmail("");
            setPassword("");
-           return navigate("/")
+            navigate("/")
             
         } catch (err) {
            console.log(err);
