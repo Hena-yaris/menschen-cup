@@ -39,7 +39,7 @@ const Login = () => {
 
            setEmail("");
            setPassword("");
-            navigate("/")
+            navigate("/teamslist");
             
         } catch (err) {
            console.log(err);
