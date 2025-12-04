@@ -12,7 +12,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     const { username, userId, role } = jwt.verify(
       token,
-      process.env.JWT_SECRET || "henayaris"
+      process.env.JWT_SECRET || "marmic"
     );
 
     req.user = { username, userId, role };

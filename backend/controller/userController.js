@@ -84,7 +84,7 @@ const login = async (req, res) => {
         userId: user.id, // FIXED
         role: user.role,
       },
-      process.env.JWT_SECRET || "henayaris",
+      process.env.JWT_SECRET || "marmic",
       { expiresIn: "21d" }
     );
 

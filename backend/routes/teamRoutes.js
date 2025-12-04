@@ -15,6 +15,6 @@ router.get("/teamslist", authMiddleware, teamsList);
 router.post('/auto-group',authMiddleware,roleMiddleware("admin"),generateGroups);
 
 //resetting teams data
-router.post("/reset-Demo",authMiddleware,roleMiddleware("admin"),resetTeamsData)
+router.delete("/reset-Demo",authMiddleware,roleMiddleware("admin"),resetTeamsData)
 
 module.exports =router;
