@@ -15,7 +15,9 @@ const AddTeam = ()=> {
 
 
     try {
-      const res = await axiosBase.post("/teams/add-teams", { name });
+      const res = await axiosBase.post(
+        "/teams/add-teams",{name}
+      );
 
       alert(res.data.message);
       setName("");
@@ -36,7 +38,7 @@ const AddTeam = ()=> {
     } catch (error) {
       console.error(error);
       alert("Error Generating teams");
-      console.log(res.data);
+      console.log(error.response?.data);
     }finally{
       setIsLoading(false);
     }
@@ -51,7 +53,7 @@ const AddTeam = ()=> {
 
     }catch(err) {
         alert("Error generating match")
-        console.log(res.data);
+       console.log(err.response?.data);
     }finally{
       setIsLoading(false);
     }
@@ -99,7 +101,7 @@ const AddTeam = ()=> {
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter team name (e.g., 'The Titans')"
+                  placeholder="Enter team name (e.g., 'Manufacture 2nd')"
                   className="p-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400
                              focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                   value={name}

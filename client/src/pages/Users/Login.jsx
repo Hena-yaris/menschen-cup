@@ -23,7 +23,7 @@ const Login = () => {
             return alert("please enter required filed")
         }
 
-        if(password.length <8 ) {
+        if(password.length < 8 ) {
             return alert("password must be at least 8 character")
         }
         setIsLoading(true);
