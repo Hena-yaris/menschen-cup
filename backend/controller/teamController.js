@@ -82,6 +82,26 @@ const generateGroups = async (req, res) => {
 };
 
 
-//generate matches
 
-module.exports = { addTeams, teamsList, generateGroups };
+//reset
+const resetTeamsData = async(req,res)=> {
+
+  try {
+    // Delete all matches
+    await dbconnection.execute("DELETE FROM matches");
+
+    // Delete all teams
+    await dbconnection.execute("DELETE FROM teams");
+
+    // Reset auto-increment IDs
+    await dbconnection.execute("ALTER TABLE teams AUTO_INCREMENT = 1");
+    await dbconnection.execute("ALTER TABLE matches AUTO_INCREMENT = 1");
+
+    res.status(200).json({ message: "Demo data wiped successfully!" });
+  } catch (err) {
+    console.error("❌ Reset error:", err);
+    res.status(500).json({ message: "Error resetting demo data" });
+  }
+}
+
+module.exports = { addTeams, teamsList, generateGroups,resetTeamsData };

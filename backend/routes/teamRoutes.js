@@ -5,10 +5,16 @@ const {
   addTeams,
   teamsList,
   generateGroups,
+  resetTeamsData,
 } = require("../controller/teamController");
+const roleMiddleware = require('../middleware/RoleMiddleware');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/add-teams',addTeams);
-router.get('/teamslist',teamsList);
-router.post('/auto-group',generateGroups);
+router.post('/add-teams',authMiddleware,roleMiddleware("admin"),addTeams);
+router.get("/teamslist", authMiddleware, teamsList);
+router.post('/auto-group',authMiddleware,roleMiddleware("admin"),generateGroups);
+
+//resetting teams data
+router.post("/reset-Demo",authMiddleware,roleMiddleware("admin"),resetTeamsData)
 
 module.exports =router;

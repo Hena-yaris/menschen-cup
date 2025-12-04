@@ -124,13 +124,14 @@ const createAdmin = async (req, res) => {
   try {
     // 1. Check secret key
     if (secret !== process.env.ADMIN_SETUP_KEY) {
-        console.log("Got secret:", secret);
-        console.log("ENV secret:", process.env.ADMIN_SETUP_KEY);
+        // console.log("Got secret:", secret);
+        // console.log("ENV secret:", process.env.ADMIN_SETUP_KEY);
+        
 
-      return res.status(403).json({ message: "Unauthorized" });
+      return res.status(400).json({ message: "Unauthorized" });
     }
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !secret) {
       return res.status(400).json({ message: "Provide all fields" });
     }
 

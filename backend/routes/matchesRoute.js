@@ -8,9 +8,11 @@ const {
   finalSelection,
   knockoutFixture,
 } = require("../controller/matchController");
+const roleMiddleware = require("../middleware/RoleMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
-router.post("/add-match", addMatch);
+router.post("/add-match",authMiddleware,roleMiddleware("admin"), addMatch);
 router.post("/generateGroup-match", autoGenerateGroupMatches);
 router.get("/groupMatch-fixture", groupMatchFixtures);
 

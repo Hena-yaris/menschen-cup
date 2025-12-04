@@ -20,9 +20,14 @@ app.get('/', (req,res)=> {
         const teamRoutes = require('./routes/teamRoutes');
         app.use('/api/teams',teamRoutes);
 
+        
+        
+
         //matches
         const matchRoutes = require('./routes/matchesRoute')
         app.use("/api/matches", matchRoutes);
+
+        
 
         //users
         const userRoutes = require('./routes/userRoutes');
