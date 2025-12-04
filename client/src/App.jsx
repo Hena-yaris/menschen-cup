@@ -17,6 +17,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import AdminRegister from "./pages/Users/AdminRegistration";
 import Unauthorized from "./pages/Unauthorized";
+import Setting from "./pages/Setting";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
         >
           <Route path="/addteam" element={<AddTeam />} />
           <Route path="/addmatch" element={<RecordMatch />} />
+          <Route path="admin/setting" element={<Setting/>}/>
         </Route>
 
         {/* ---------------- UNAUTHORIZED ---------------- */}

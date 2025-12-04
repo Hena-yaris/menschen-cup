@@ -1,9 +1,13 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Trophy, LogOut } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+
 
 function StudentsNavbar() {
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext);
 
 
   const baseClasses =
@@ -54,7 +58,7 @@ function StudentsNavbar() {
             }`
           }
         >
-          Teams List
+          Groups
         </NavLink>
 
        
@@ -84,7 +88,7 @@ function StudentsNavbar() {
         {/* Avatar + Logout */}
         <div className="flex items-center gap-3 ml-2">
           <img
-            src="https://ui-avatars.com/api/?name=Admin&background=ff8a00&color=000"
+            src={`https://ui-avatars.com/api/?name=${user?.username}&background=ff8a00&color=000`}
             alt="avatar"
             className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-orange-500 shadow-md"
           />

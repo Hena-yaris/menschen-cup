@@ -1,9 +1,12 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Trophy, LogOut } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 function AdminNavbar() {
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext)
   
   
 
@@ -64,7 +67,7 @@ function AdminNavbar() {
             }`
           }
         >
-          Teams List
+          Groups
         </NavLink>
 
         <NavLink
@@ -102,18 +105,20 @@ function AdminNavbar() {
 
         {/* Avatar + Logout */}
         <div className="flex items-center gap-3 ml-2">
-          <img
-            src="https://ui-avatars.com/api/?name=Admin&background=ff8a00&color=000"
-            alt="avatar"
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-orange-500 shadow-md"
-          />
+          <NavLink to="admin/setting">
+            <img
+              src={`https://ui-avatars.com/api/?name=${user?.username}&background=ff8a00&color=000`}
+              alt="avatar"
+              className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-orange-500 shadow-md capitalize"
+            />
+          </NavLink>
 
           <button
-          onClick={(e)=> {
-            localStorage.removeItem("token")
-            localStorage.removeItem("user")
-            navigate('/login')
-          }}
+            onClick={(e) => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              navigate("/login");
+            }}
             className="
               flex items-center gap-2 
               text-orange-400 hover:text-orange-300 
