@@ -7,7 +7,7 @@ const {
   generateGroups,
   resetTeamsData,
 } = require("../controller/teamController");
-const roleMiddleware = require('../middleware/RoleMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
 const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/add-teams',authMiddleware,roleMiddleware("admin"),addTeams);

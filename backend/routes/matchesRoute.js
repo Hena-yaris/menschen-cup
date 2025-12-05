@@ -8,7 +8,7 @@ const {
   finalSelection,
   knockoutFixture,
 } = require("../controller/matchController");
-const roleMiddleware = require("../middleware/RoleMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
