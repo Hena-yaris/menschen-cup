@@ -47,8 +47,6 @@ async function setupDB() {
     await dbconnection.execute(createMatches);
     console.log("✅ Matches table ready");
 
-    await dbconnection.execute(createStages);
-    console.log("✅ Stages table ready");
 
     await dbconnection.execute(createUsers);
     console.log("✅ Users table ready");

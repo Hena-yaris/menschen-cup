@@ -3,7 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 // Use environment port OR fallback (important for deployment)
-const PORT = process.env.PORT || 3000;
+const DB_PORT = process.env.DB_PORT || 3000;
 
 // Initialize app
 const app = express();
@@ -30,8 +30,8 @@ async function start() {
     await dbconnection.execute("SELECT 'DB Connected'");
     console.log("✅ Database connection established");
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    app.listen(DB_PORT, () => {
+      console.log(`🚀 Server running on port ${DB_PORT}`);
     });
   } catch (err) {
     console.error("❌ DB Connection Failed:", err.message);
