@@ -14,8 +14,9 @@ app.get("/", (req, res) => {
   res.send("Server is running 🚀");
 });
 
+
 app.use("/api/teams", require("./routes/teamRoutes"));
-app.use("/api/matches", require("./routes/matchesRoute"));
+app.use("/api/matches", require("./routes/matchesRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 
 const dbconnection = require("./db/db-config");

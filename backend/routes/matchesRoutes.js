@@ -12,6 +12,9 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
+console.log("🔥 matchesRoutes loaded");
+
+
 router.post("/add-match",authMiddleware,roleMiddleware("admin"), addMatch);
 router.post("/generateGroup-match", autoGenerateGroupMatches);
 router.get("/groupMatch-fixture", groupMatchFixtures);

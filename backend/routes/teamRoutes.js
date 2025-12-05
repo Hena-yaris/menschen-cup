@@ -10,6 +10,9 @@ const {
 const roleMiddleware = require('../middleware/roleMiddleware');
 const authMiddleware = require('../middleware/authMiddleware');
 
+console.log("🔥 teamRoutes loaded");
+
+
 router.post('/add-teams',authMiddleware,roleMiddleware("admin"),addTeams);
 router.get("/teamslist", authMiddleware, teamsList);
 router.post('/auto-group',authMiddleware,roleMiddleware("admin"),generateGroups);
