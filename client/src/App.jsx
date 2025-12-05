@@ -11,7 +11,7 @@ import Login from "./pages/Users/Login";
 
 import PublicLayout from "./Layouts/PublicLayout";
 import PrivateLayout from "./Layouts/PrivateLayout";
-import PublicHome from "./pages/Home/publicHome";
+import PublicHome from "./pages/Home/PublicHome";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
